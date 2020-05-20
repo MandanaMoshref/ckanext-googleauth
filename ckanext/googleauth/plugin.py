@@ -26,7 +26,7 @@ import ckan.plugins.toolkit as toolkit
 from ckan.lib.plugins import DefaultTranslation
 import json
 import uuid
-import pylons
+from ckan.common import session
 import pylons.config as config
 import ckan.lib.helpers as helpers
 import requests
@@ -135,11 +135,11 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
 	#    	del pylons.session['ckanext-google-accesstoken']
 	#    else:
 	#	raise GoogleAuthException('Token not revoked')
-        if 'ckanext-google-user' in pylons.session:
-            del pylons.session['ckanext-google-user']
-        if 'ckanext-google-email' in pylons.session:
-            del pylons.session['ckanext-google-email']
-        pylons.session.save()
+        if 'ckanext-google-user' in session:
+            del session['ckanext-google-user']
+        if 'ckanext-google-email' in session:
+            del session['ckanext-google-email']
+        session.save()
 
 
 
@@ -165,18 +165,18 @@ class GoogleauthPlugin(plugins.SingletonPlugin, DefaultTranslation):
                                			'name': user_account,
                                			'password': self.get_ckanpasswd()})
 
-		pylons.session['ckanext-google-user'] = user_ckan['name']
-        	pylons.session['ckanext-google-email'] = mail_verified
+		session['ckanext-google-user'] = user_ckan['name']
+        	session['ckanext-google-email'] = mail_verified
 
 		#to revoke the Google token uncomment the code below
 		#pylons.session['ckanext-google-accesstoken'] = params['token']
-            	pylons.session.save()
+            	session.save()
 
 
 
     #if someone is logged in will be set the parameter c.user
     def identify(self):
-	user_ckan = pylons.session.get('ckanext-google-user')
+	user_ckan = session.get('ckanext-google-user')
         if user_ckan:
             toolkit.c.user = user_ckan
 
